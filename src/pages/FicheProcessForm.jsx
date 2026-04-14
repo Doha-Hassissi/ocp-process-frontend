@@ -55,6 +55,7 @@ const SectionHeader = ({ icon: Icon, title, color = "emerald" }) => {
 const FicheProcessForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("infos");
 
   const [formData, setFormData] = useState({
@@ -134,24 +135,17 @@ const FicheProcessForm = () => {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
-      const cleanData = JSON.parse(
-        JSON.stringify(formData, (key, value) => {
-          return value === "" ? 0 : value;
-        }),
-      );
-
       const dataToSend = {
-        ...cleanData,
+        ...formData,
         id: "FICHE-" + Date.now(),
         infos_generales: {
-          ...cleanData.infos_generales,
-          date: new Date(cleanData.infos_generales.date),
+          ...formData.infos_generales,
+          date: new Date(formData.infos_generales.date),
         },
       };
-
-      console.log("Données envoyées :", dataToSend);
 
       const response = await axios.post(
         "https://ocp-process-backend-production.up.railway.app/api/fiches",
@@ -159,15 +153,22 @@ const FicheProcessForm = () => {
       );
 
       if (response.status === 200 || response.status === 201) {
-        alert("Fiche Process enregistrée avec succès !");
-        navigate("/ficheprocesslist");
+        alert("✅ Succès : La fiche process a été enregistrée avec succès !");
+
+        setTimeout(() => {
+          navigate("/ficheprocesslist");
+        }, 500);
       }
     } catch (err) {
       console.error("Erreur Backend:", err.response?.data || err.message);
-      alert("Erreur lors de l'enregistrement. Vérifie la console.");
+
+      const errorDetail =
+        err.response?.data?.message || "Erreur de connexion au serveur";
+      alert(`❌ Erreur : Impossible d'enregistrer la fiche. (${errorDetail})`);
+    } finally {
+      setLoading(false);
     }
   };
-
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto bg-slate-50 min-h-screen font-sans">
       <form
@@ -545,9 +546,16 @@ const FicheProcessForm = () => {
               </button>
               <button
                 type="submit"
-                className="flex-2 flex items-center justify-center gap-3 px-12 py-4 bg-emerald-600 text-white rounded-2xl text-[10px] font-black shadow-xl hover:bg-emerald-700 hover:-translate-y-1 transition-all uppercase"
+                disabled={loading}
+                className={`flex-2 flex items-center justify-center gap-3 px-12 py-4 rounded-2xl text-[10px] font-black shadow-xl transition-all uppercase ${
+                  loading
+                    ? "bg-slate-400 cursor-not-allowed"
+                    : "bg-emerald-600 hover:bg-emerald-700 hover:-translate-y-1 text-white"
+                }`}
               >
-                Enregistrer fiche process
+                {loading
+                  ? "Enregistrement en cours..."
+                  : "Enregistrer fiche process"}
               </button>
             </div>
           </div>
