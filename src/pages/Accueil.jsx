@@ -10,7 +10,7 @@ function Accueil() {
         {/* Image */}
         <div className="md:w-1/2">
           <img 
-            src="backgroundimg.png" 
+            src="/backgroundimg.png" 
             alt="workflow"
             className="w-full max-w-xl mx-auto animate-fadeIn"
           />
@@ -45,22 +45,22 @@ function Accueil() {
 
           {/* Card */}
           <div className="bg-white p-6 w-64 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-2 transition duration-300">
-            <img src="centralisationimg.png" alt="" className="h-20 mx-auto mb-4"/>
+            <img src="/centralisationimg.png" alt="" className="h-20 mx-auto mb-4"/>
             <h4 className="text-green-700 font-semibold">Centralisation</h4>
           </div>
 
           <div className="bg-white p-6 w-64 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-2 transition duration-300">
-            <img src="checklistimg.png" alt="" className="h-20 mx-auto mb-4"/>
+            <img src="/checklistimg.png" alt="" className="h-20 mx-auto mb-4"/>
             <h4 className="text-green-700 font-semibold">Checklists digitales</h4>
           </div>
 
           <div className="bg-white p-6 w-64 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-2 transition duration-300">
-            <img src="gestionanomalieimg.png" alt="" className="h-20 mx-auto mb-4"/>
+            <img src="/gestionanomalieimg.png" alt="" className="h-20 mx-auto mb-4"/>
             <h4 className="text-green-700 font-semibold">Gestion des anomalies</h4>
           </div>
 
           <div className="bg-white p-6 w-64 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-2 transition duration-300">
-            <img src="notificationimg.png" alt="" className="h-20 mx-auto mb-4"/>
+            <img src="/notificationimg.png" alt="" className="h-20 mx-auto mb-4"/>
             <h4 className="text-green-700 font-semibold">Notifications</h4>
           </div>
 
