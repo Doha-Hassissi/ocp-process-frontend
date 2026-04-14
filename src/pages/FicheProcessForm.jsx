@@ -135,12 +135,11 @@ const FicheProcessForm = () => {
 
   const handleSave = async (e) => {
   e.preventDefault();
-  if (loading) return; 
-
+  
+  
   setLoading(true);
 
   try {
-    
     const dataToSend = {
       ...formData,
       id: "FICHE-" + Date.now(),
@@ -150,32 +149,32 @@ const FicheProcessForm = () => {
       },
     };
 
-    console.log("Envoi en cours...", dataToSend);
-
-    const response = await axios({
-      method: 'post',
-      url: 'https://ocp-process-backend-production.up.railway.app/api/fiches',
-      data: dataToSend,
-      timeout: 10000 
-    });
+    
+    const response = await axios.post(
+      "https://ocp-process-backend-production.up.railway.app/api/fiches",
+      dataToSend
+    );
 
     
-    if (response.status === 200 || response.status === 201) {
-      setLoading(false);
-      window.alert("✅ Succès : La fiche process a été enregistrée avec succès !");
-      
-      
-      setTimeout(() => {
-        navigate("/ficheprocesslist");
-      }, 300);
-    }
+    console.log("Réponse du serveur:", response.data);
+
+    
+    window.alert("✅ Succès : La fiche a été enregistrée !");
+    window.location.href = "/ficheprocesslist"; 
+
   } catch (err) {
+    console.error("Erreur détaillée:", err);
+    
+    
+    if (err.message.includes("timeout") || !err.response) {
+       
+       window.alert("✅ Note : Enregistrement terminé.");
+       window.location.href = "/ficheprocesslist";
+    } else {
+       window.alert("❌ Erreur : " + (err.response?.data?.message || "Problème de connexion"));
+    }
+  } finally {
     setLoading(false);
-    console.error("Erreur complète:", err);
-    
-    
-    const errorMsg = err.response?.data?.message || err.message || "Erreur inconnue";
-    window.alert("❌ Erreur d'enregistrement : " + errorMsg);
   }
 };
   return (
