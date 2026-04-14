@@ -85,7 +85,9 @@ const FicheProcessForm = () => {
   useEffect(() => {
     if (id) {
       axios
-        .get(`https://ocp-process-backend-production.up.railway.app/api/fiches/${id}`)
+        .get(
+          `https://ocp-process-backend-production.up.railway.app/api/fiches/${id}`,
+        )
         .then((res) => setFormData(res.data))
         .catch((err) => console.error("Erreur de chargement:", err));
     }
@@ -132,26 +134,38 @@ const FicheProcessForm = () => {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    const dataToSend = { ...formData, id: "FICHE-" + Date.now() };
- // Convertir champs vides en 0 (optionnel)
-  const sanitizeNumbers = (obj) => {
-    for (let key in obj) {
-      if (typeof obj[key] === "object" && obj[key] !== null) sanitizeNumbers(obj[key]);
-      else if (obj[key] === "") obj[key] = 0;
+
+    try {
+      const cleanData = JSON.parse(
+        JSON.stringify(formData, (key, value) => {
+          return value === "" ? 0 : value;
+        }),
+      );
+
+      const dataToSend = {
+        ...cleanData,
+        id: "FICHE-" + Date.now(),
+        infos_generales: {
+          ...cleanData.infos_generales,
+          date: new Date(cleanData.infos_generales.date),
+        },
+      };
+
+      console.log("Données envoyées :", dataToSend);
+
+      const response = await axios.post(
+        "https://ocp-process-backend-production.up.railway.app/api/fiches",
+        dataToSend,
+      );
+
+      if (response.status === 200 || response.status === 201) {
+        alert("Fiche Process enregistrée avec succès !");
+        navigate("/ficheprocesslist");
+      }
+    } catch (err) {
+      console.error("Erreur Backend:", err.response?.data || err.message);
+      alert("Erreur lors de l'enregistrement. Vérifie la console.");
     }
-  };
-  sanitizeNumbers(dataToSend);
-
-  dataToSend.infos_generales.date = new Date(dataToSend.infos_generales.date);
-
-  try {
-    await axios.post("https://ocp-process-backend-production.up.railway.app/api/fiches", dataToSend);
-    alert("Fiche Process enregistrée avec succès !");
-    navigate("/ficheprocesslist");
-  } catch (err) {
-    console.error(err);
-    alert("Erreur lors de l'enregistrement. Vérifie tes champs.");
-  }
   };
 
   return (
@@ -161,24 +175,20 @@ const FicheProcessForm = () => {
         className="shadow-2xl rounded-3xl overflow-hidden"
       >
         {/* HEADER */}
-        <div className="bg-white p-6 rounded-t-3xl shadow-sm border border-slate-100" >
-          
-              <button
-                type="button"
-                onClick={() => navigate("/ficheprocesslist")}
-                className="p-2 bg-slate-100 rounded-full hover:bg-emerald-100 text-emerald-700 transition-colors"
-              >
-                <ArrowLeft size={20} />
-              </button>
-              <br />
-              <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <h1 className="text-xl font-black text-slate-800 uppercase tracking-tight">
-                Fiche Process
-              </h1>
-              </div>
-            
-            
-          
+        <div className="bg-white p-6 rounded-t-3xl shadow-sm border border-slate-100">
+          <button
+            type="button"
+            onClick={() => navigate("/ficheprocesslist")}
+            className="p-2 bg-slate-100 rounded-full hover:bg-emerald-100 text-emerald-700 transition-colors"
+          >
+            <ArrowLeft size={20} />
+          </button>
+          <br />
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <h1 className="text-xl font-black text-slate-800 uppercase tracking-tight">
+              Fiche Process
+            </h1>
+          </div>
         </div>
 
         {/* NAVIGATION */}
