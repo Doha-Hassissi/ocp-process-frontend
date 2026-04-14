@@ -134,41 +134,50 @@ const FicheProcessForm = () => {
   };
 
   const handleSave = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  e.preventDefault();
+  if (loading) return; 
 
-    try {
-      const dataToSend = {
-        ...formData,
-        id: "FICHE-" + Date.now(),
-        infos_generales: {
-          ...formData.infos_generales,
-          date: new Date(formData.infos_generales.date),
-        },
-      };
+  setLoading(true);
 
-      const response = await axios.post(
-        "https://ocp-process-backend-production.up.railway.app/api/fiches",
-        dataToSend,
-      );
+  try {
+    
+    const dataToSend = {
+      ...formData,
+      id: "FICHE-" + Date.now(),
+      infos_generales: {
+        ...formData.infos_generales,
+        date: new Date(formData.infos_generales.date),
+      },
+    };
 
-      if (response.status === 200 || response.status === 201) {
-        alert("✅ Succès : La fiche process a été enregistrée avec succès !");
+    console.log("Envoi en cours...", dataToSend);
 
-        setTimeout(() => {
-          navigate("/ficheprocesslist");
-        }, 500);
-      }
-    } catch (err) {
-      console.error("Erreur Backend:", err.response?.data || err.message);
+    const response = await axios({
+      method: 'post',
+      url: 'https://ocp-process-backend-production.up.railway.app/api/fiches',
+      data: dataToSend,
+      timeout: 10000 
+    });
 
-      const errorDetail =
-        err.response?.data?.message || "Erreur de connexion au serveur";
-      alert(`❌ Erreur : Impossible d'enregistrer la fiche. (${errorDetail})`);
-    } finally {
+    
+    if (response.status === 200 || response.status === 201) {
       setLoading(false);
+      window.alert("✅ Succès : La fiche process a été enregistrée avec succès !");
+      
+      
+      setTimeout(() => {
+        navigate("/ficheprocesslist");
+      }, 300);
     }
-  };
+  } catch (err) {
+    setLoading(false);
+    console.error("Erreur complète:", err);
+    
+    
+    const errorMsg = err.response?.data?.message || err.message || "Erreur inconnue";
+    window.alert("❌ Erreur d'enregistrement : " + errorMsg);
+  }
+};
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto bg-slate-50 min-h-screen font-sans">
       <form
